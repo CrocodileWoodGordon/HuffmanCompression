@@ -1,4 +1,4 @@
-# Huffman Compression
+ Huffman Compression
 
 基于 Huffman 编码的命令行文档压缩系统，使用 C++17 实现。
 
@@ -95,8 +95,6 @@ hamlet_unzip.txt
 diff resources/个人项目-基于Huffman编码的压缩/其他附件/hamlet.txt \
      resources/个人项目-基于Huffman编码的压缩/其他附件/hamlet_unzip.txt
 ```
-
-自定义哈希实现位于 `src/hash.cpp`，采用 `resources/Hash.cpp` 中的 `splitmix64` 和双通道混合思路，并改为适合文件字节序列的确定性实现。
 
 ## 项目结构
 
