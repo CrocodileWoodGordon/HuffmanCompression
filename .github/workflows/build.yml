@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build ${{ matrix.name }}
@@ -16,11 +19,13 @@ jobs:
           - name: Linux
             os: ubuntu-latest
             artifact_name: Huffman-linux
-            artifact_path: build/Huffman
+            build_output: build/Huffman
+            asset_path: dist/Huffman-linux
           - name: Windows
             os: windows-latest
-            artifact_name: Huffman-windows
-            artifact_path: build/Release/Huffman.exe
+            artifact_name: Huffman-windows.exe
+            build_output: build/Release/Huffman.exe
+            asset_path: dist/Huffman-windows.exe
 
     steps:
       - name: Checkout
@@ -32,8 +37,50 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
+      - name: Prepare downloadable binary
+        run: |
+          cmake -E make_directory dist
+          cmake -E copy "${{ matrix.build_output }}" "${{ matrix.asset_path }}"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_path }}
+          path: ${{ matrix.asset_path }}
+
+  release:
+    name: Publish v0.0 release
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Point v0.0 tag to this commit
+        run: |
+          git tag -f v0.0 "$GITHUB_SHA"
+          git push origin refs/tags/v0.0 --force
+
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view v0.0 >/dev/null 2>&1; then
+            gh release create v0.0 \
+              --title "v0.0" \
+              --notes "Huffman compression command-line binaries."
+          fi
+          gh release upload v0.0 \
+            release-assets/Huffman-linux \
+            release-assets/Huffman-windows.exe \
+            --clobber
