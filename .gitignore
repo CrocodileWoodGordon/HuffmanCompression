@@ -1,0 +1,29 @@
+# Build directories
+build/
+cmake-build-*/
+.xmake/
+
+# Compiled binaries
+Huffman
+Huffman.exe
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+
+# Generated project outputs
+*.huff
+*_freq.txt
+*_unzip.txt
+*_adp.huff
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
