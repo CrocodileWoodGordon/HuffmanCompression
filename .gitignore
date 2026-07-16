@@ -16,6 +16,7 @@ Huffman.exe
 *.exe
 
 # Generated project outputs
+output/
 *.huff
 *_freq.txt
 *_unzip.txt
@@ -26,4 +27,3 @@ Huffman.exe
 Thumbs.db
 .vscode/
 .idea/
-
